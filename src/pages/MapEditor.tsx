@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
+import { useState, useEffect, useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
 import { MapContainer, TileLayer, Polygon, useMap } from 'react-leaflet';
 import L, { LatLngExpression } from 'leaflet';
 import { Edit, Trash2, Plus, Download, RotateCcw, AlertCircle, X } from 'lucide-react';
@@ -303,16 +303,14 @@ export default function MapEditor() {
   // Tancar el panell d'edició
   const closePanel = () => {
     // Capturar les coordenades actuals del polígon abans de tancar
-    // per assegurar que tenim els canvis més recents del polígon
-    if (drawControlRef.current && editorState.editingAssociacio) {
-      const currentCoords = drawControlRef.current.getCurrentPolygonCoords();
-      if (currentCoords && currentCoords.length > 0) {
-        console.log('closePanel - saving final polygon coords:', currentCoords);
-        updateAssociacio(editorState.editingAssociacio.id!, {
-          ...editorState.editingAssociacio,
-          poligon: currentCoords,
-        });
-      }
+    // i guardar tots els canvis del formulari
+    if (editorState.editingAssociacio) {
+      const currentCoords = drawControlRef.current?.getCurrentPolygonCoords();
+
+      updateAssociacio(editorState.editingAssociacio.id!, {
+        ...editorState.editingAssociacio,
+        poligon: currentCoords && currentCoords.length > 0 ? currentCoords : editorState.editingAssociacio.poligon,
+      });
     }
 
     // Tancar el panell
@@ -323,7 +321,7 @@ export default function MapEditor() {
     });
   };
 
-  // Actualitzar camp del formulari (auto-save)
+  // Actualitzar camp del formulari (només estat local)
   const updateField = (field: keyof Associacio, value: any) => {
     setEditorState((prevState) => {
       if (!prevState.editingAssociacio) return prevState;
@@ -333,11 +331,6 @@ export default function MapEditor() {
         [field]: value,
       };
 
-      // Auto-guardar els canvis a localStorage
-      if (prevState.editingAssociacio.id) {
-        updateAssociacio(prevState.editingAssociacio.id, updated);
-      }
-
       return {
         ...prevState,
         editingAssociacio: updated,
@@ -346,13 +339,24 @@ export default function MapEditor() {
   };
 
   // Quan es crea/edita un polígon
-  const handlePolygonCreated = (coords: [number, number][]) => {
+  const handlePolygonCreated = useCallback((coords: [number, number][]) => {
     console.log('handlePolygonCreated called with coords:', coords);
     console.log('Number of points:', coords.length);
     // Crear una còpia nova de l'array per assegurar que React detecta el canvi
     const newCoords = [...coords];
-    updateField('poligon', newCoords);
-  };
+
+    setEditorState((prevState) => {
+      if (!prevState.editingAssociacio) return prevState;
+
+      return {
+        ...prevState,
+        editingAssociacio: {
+          ...prevState.editingAssociacio,
+          poligon: newCoords,
+        },
+      };
+    });
+  }, []);
 
   // Eliminar associació
   const handleDelete = (id: string) => {
