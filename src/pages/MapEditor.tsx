@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import { MapContainer, TileLayer, Polygon, useMap } from 'react-leaflet';
 import L, { LatLngExpression } from 'leaflet';
-import { Edit, Trash2, Plus, Download, RotateCcw, AlertCircle, Save, X } from 'lucide-react';
+import { Edit, Trash2, Plus, Download, RotateCcw, AlertCircle, X } from 'lucide-react';
 import { useAssociacions } from '../hooks/useAssociacions';
 import type { Associacio } from '../types';
 import 'leaflet/dist/leaflet.css';
@@ -276,26 +276,46 @@ export default function MapEditor() {
 
   // Iniciar creació d'una nova associació
   const startCreate = () => {
+    const novaAssociacio: Associacio = {
+      id: generateId(),
+      nom: 'Nova Associació',
+      abreviacio: 'NOVA',
+      color: '#f97316',
+      poligon: [],
+      descripcio: '',
+      contacte: '',
+      email: '',
+      telefon: '',
+      url: '',
+    };
+
+    // Crear immediatament amb valors per defecte
+    addAssociacio(novaAssociacio);
+
+    // Editar la nova associació
     setEditorState({
-      mode: 'create',
-      selectedId: null,
-      editingAssociacio: {
-        id: generateId(),
-        nom: '',
-        abreviacio: '',
-        color: '#f97316',
-        poligon: [],
-        descripcio: '',
-        contacte: '',
-        email: '',
-        telefon: '',
-        url: '',
-      },
+      mode: 'edit',
+      selectedId: novaAssociacio.id,
+      editingAssociacio: { ...novaAssociacio },
     });
   };
 
-  // Cancel·lar edició/creació
-  const cancelEdit = () => {
+  // Tancar el panell d'edició
+  const closePanel = () => {
+    // Capturar les coordenades actuals del polígon abans de tancar
+    // per assegurar que tenim els canvis més recents del polígon
+    if (drawControlRef.current && editorState.editingAssociacio) {
+      const currentCoords = drawControlRef.current.getCurrentPolygonCoords();
+      if (currentCoords && currentCoords.length > 0) {
+        console.log('closePanel - saving final polygon coords:', currentCoords);
+        updateAssociacio(editorState.editingAssociacio.id!, {
+          ...editorState.editingAssociacio,
+          poligon: currentCoords,
+        });
+      }
+    }
+
+    // Tancar el panell
     setEditorState({
       mode: 'view',
       selectedId: null,
@@ -303,68 +323,24 @@ export default function MapEditor() {
     });
   };
 
-  // Guardar canvis
-  const saveChanges = () => {
-    if (!editorState.editingAssociacio) return;
-
-    // Capturar les coordenades actuals del polígon des del DrawControl
-    // per assegurar que tenim els canvis més recents, fins i tot si l'usuari
-    // no ha clicat el botó "Save" de leaflet-draw
-    let finalPolygon = editorState.editingAssociacio.poligon;
-    if (drawControlRef.current) {
-      const currentCoords = drawControlRef.current.getCurrentPolygonCoords();
-      if (currentCoords && currentCoords.length > 0) {
-        console.log('saveChanges - using current coords from DrawControl:', currentCoords);
-        finalPolygon = currentCoords;
-        // Actualitzar l'estat amb les coordenades actuals
-        setEditorState((prevState) => {
-          if (!prevState.editingAssociacio) return prevState;
-          return {
-            ...prevState,
-            editingAssociacio: {
-              ...prevState.editingAssociacio,
-              poligon: currentCoords,
-            },
-          };
-        });
-      }
-    }
-
-    const { id, nom, abreviacio, color } = editorState.editingAssociacio;
-
-    console.log('saveChanges - final poligon:', finalPolygon);
-    console.log('saveChanges - final poligon length:', finalPolygon?.length);
-
-    if (!id || !nom || !abreviacio || !color || !finalPolygon || finalPolygon.length < 3) {
-      alert('Si us plau, omple els camps obligatoris: nom, abreviació, color i polígon (mínim 3 punts)');
-      return;
-    }
-
-    const dataToSave = {
-      ...editorState.editingAssociacio,
-      poligon: finalPolygon,
-    };
-
-    if (editorState.mode === 'create') {
-      addAssociacio(dataToSave as Associacio);
-    } else {
-      updateAssociacio(id, dataToSave);
-    }
-
-    cancelEdit();
-  };
-
-  // Actualitzar camp del formulari
+  // Actualitzar camp del formulari (auto-save)
   const updateField = (field: keyof Associacio, value: any) => {
     setEditorState((prevState) => {
       if (!prevState.editingAssociacio) return prevState;
 
+      const updated = {
+        ...prevState.editingAssociacio,
+        [field]: value,
+      };
+
+      // Auto-guardar els canvis a localStorage
+      if (prevState.editingAssociacio.id) {
+        updateAssociacio(prevState.editingAssociacio.id, updated);
+      }
+
       return {
         ...prevState,
-        editingAssociacio: {
-          ...prevState.editingAssociacio,
-          [field]: value,
-        },
+        editingAssociacio: updated,
       };
     });
   };
@@ -382,7 +358,7 @@ export default function MapEditor() {
   const handleDelete = (id: string) => {
     if (confirm('Estàs segur que vols eliminar aquesta associació?')) {
       deleteAssociacio(id);
-      cancelEdit();
+      closePanel();
     }
   };
 
@@ -508,13 +484,14 @@ export default function MapEditor() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="font-semibold text-warm-900 text-lg">
-                  {editorState.mode === 'create' ? 'Nova Associació' : 'Editar Associació'}
+                  Propietats de l'associació
                 </h2>
                 <button
-                  onClick={cancelEdit}
-                  className="p-1.5 hover:bg-warm-100 rounded-full transition-colors"
+                  onClick={closePanel}
+                  className="px-3 py-1.5 bg-warm-100 text-warm-700 rounded-lg hover:bg-warm-200 transition-colors text-sm font-medium flex items-center gap-1"
                 >
-                  <X size={20} className="text-warm-600" />
+                  <X size={16} />
+                  Tancar
                 </button>
               </div>
 
@@ -666,33 +643,22 @@ export default function MapEditor() {
               </details>
 
               {/* Botons d'acció */}
-              <div className="space-y-2 pt-4">
-                <div className="flex gap-2">
-                  <button
-                    onClick={saveChanges}
-                    className="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2.5 rounded-lg hover:bg-green-700 transition-colors font-semibold"
-                  >
-                    <Save size={18} />
-                    Guardar
-                  </button>
-                  {editorState.mode === 'edit' && (
-                    <button
-                      onClick={() => editorState.selectedId && handleDelete(editorState.selectedId)}
-                      className="px-4 py-2.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  )}
-                </div>
-                {isDirty && (
-                  <button
-                    onClick={() => downloadJSON(editorState.editingAssociacio?.id)}
-                    className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
-                  >
-                    <Download size={18} />
-                    Descarregar JSON
-                  </button>
-                )}
+              <div className="space-y-2 pt-4 border-t border-warm-200 mt-4">
+                <button
+                  onClick={() => downloadJSON(editorState.editingAssociacio?.id)}
+                  className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                >
+                  <Download size={18} />
+                  Descarregar JSON
+                </button>
+
+                <button
+                  onClick={() => editorState.selectedId && handleDelete(editorState.selectedId)}
+                  className="w-full flex items-center justify-center gap-2 bg-white text-red-700 border-2 border-red-200 px-4 py-2.5 rounded-lg hover:bg-red-50 transition-colors font-semibold"
+                >
+                  <Trash2 size={18} />
+                  Eliminar Associació
+                </button>
               </div>
             </div>
           )}
@@ -706,7 +672,7 @@ export default function MapEditor() {
             className="w-full flex items-center justify-center gap-2 bg-warm-200 text-warm-800 px-4 py-2.5 rounded-lg hover:bg-warm-300 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <RotateCcw size={18} />
-            Esborrar Canvis
+            Desfer Canvis
           </button>
         </div>
       </div>
