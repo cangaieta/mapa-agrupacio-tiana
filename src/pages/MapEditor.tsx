@@ -420,7 +420,12 @@ export default function MapEditor() {
   const handleDelete = (id: string) => {
     if (confirm('Estàs segur que vols eliminar aquesta associació?')) {
       deleteAssociacio(id);
-      closePanel();
+      // Tancar el panell sense guardar (l'associació ja s'ha eliminat)
+      setEditorState({
+        mode: 'view',
+        selectedId: null,
+        editingAssociacio: null,
+      });
     }
   };
 
