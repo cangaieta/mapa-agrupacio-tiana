@@ -315,7 +315,12 @@ export default function MapEditor() {
       nom: 'Nova Associació',
       abreviacio: 'NOVA',
       color: generateRandomColor(),
-      poligon: [],
+      poligon: [
+        [41.479, 2.264],
+        [41.479, 2.270],
+        [41.483, 2.270],
+        [41.483, 2.264],
+      ],
       descripcio: '',
       contacte: '',
       email: '',
