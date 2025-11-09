@@ -1,5 +1,5 @@
 {
-  "id": "aavv-centre",
+  "id": "av-cangaieta",
   "nom": "Associació Veïnal Can Gaietà",
   "abreviacio": "AV Can Gaietà",
   "color": "#f97316",
@@ -81,9 +81,9 @@
       2.2721529006958012
     ]
   ],
-  "url": "https://example.com/av-centre",
-  "descripcio": "Associació de veïns del nucli central de Tiana",
-  "contacte": "President/a del Centre",
-  "email": "centre@tiana.cat",
-  "telefon": "93 123 45 67"
+  "url": "https://cangaieta.cat",
+  "descripcio": "Associació del barri de Can Gaietà",
+  "contacte": "",
+  "email": "info@cangaieta.cat",
+  "telefon": ""
 }
