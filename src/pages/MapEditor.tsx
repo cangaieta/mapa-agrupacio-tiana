@@ -257,7 +257,8 @@ export default function MapEditor() {
 
   const drawControlRef = useRef<{ getCurrentPolygonCoords: () => [number, number][] | null }>(null);
 
-  const tianaCenter: LatLngExpression = [41.4917, 2.2647];
+  // Centre ajustat per mostrar millor la zona habitada (més al sud, menys muntanya)
+  const tianaCenter: LatLngExpression = [41.48, 2.27];
 
   // Generar nou ID
   const generateId = () => {

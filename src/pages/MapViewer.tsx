@@ -31,7 +31,7 @@ export default function MapViewer() {
   const [selectedAssociacio, setSelectedAssociacio] = useState<Associacio | null>(null);
 
   // Centre de Tiana
-  const tianaCenter: LatLngExpression = [41.4917, 2.2647];
+  const tianaCenter: LatLngExpression = [41.48, 2.27];
 
   // Calcular el centre d'un polígon (centroide real)
   const getPolygonCenter = (coords: [number, number][]): LatLngExpression => {
