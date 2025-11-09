@@ -666,20 +666,31 @@ export default function MapEditor() {
               </details>
 
               {/* Botons d'acció */}
-              <div className="flex gap-2 pt-4">
-                <button
-                  onClick={saveChanges}
-                  className="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2.5 rounded-lg hover:bg-green-700 transition-colors font-semibold"
-                >
-                  <Save size={18} />
-                  Guardar
-                </button>
-                {editorState.mode === 'edit' && (
+              <div className="space-y-2 pt-4">
+                <div className="flex gap-2">
                   <button
-                    onClick={() => editorState.selectedId && handleDelete(editorState.selectedId)}
-                    className="px-4 py-2.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                    onClick={saveChanges}
+                    className="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2.5 rounded-lg hover:bg-green-700 transition-colors font-semibold"
                   >
-                    <Trash2 size={18} />
+                    <Save size={18} />
+                    Guardar
+                  </button>
+                  {editorState.mode === 'edit' && (
+                    <button
+                      onClick={() => editorState.selectedId && handleDelete(editorState.selectedId)}
+                      className="px-4 py-2.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )}
+                </div>
+                {isDirty && (
+                  <button
+                    onClick={() => downloadJSON(editorState.editingAssociacio?.id)}
+                    className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                  >
+                    <Download size={18} />
+                    Descarregar JSON
                   </button>
                 )}
               </div>
@@ -688,18 +699,7 @@ export default function MapEditor() {
         </div>
 
         {/* Footer amb accions globals */}
-        <div className="border-t border-warm-200 p-4 space-y-2 bg-warm-50">
-          <button
-            onClick={() => downloadJSON(editorState.editingAssociacio?.id)}
-            disabled={!isDirty}
-            className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Download size={18} />
-            Descarregar JSON
-            {editorState.editingAssociacio && (
-              <span className="text-xs opacity-75">(actual)</span>
-            )}
-          </button>
+        <div className="border-t border-warm-200 p-4 bg-warm-50">
           <button
             onClick={clearDirtyData}
             disabled={!isDirty}
