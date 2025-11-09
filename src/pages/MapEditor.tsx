@@ -247,7 +247,6 @@ export default function MapEditor() {
     addAssociacio,
     deleteAssociacio,
     clearDirtyData,
-    downloadJSON,
   } = useAssociacions();
 
   const [editorState, setEditorState] = useState<EditorState>({
@@ -357,6 +356,31 @@ export default function MapEditor() {
       };
     });
   }, []);
+
+  // Descarregar JSON de l'associació en edició actual
+  const handleDownloadCurrentJSON = () => {
+    if (!editorState.editingAssociacio) return;
+
+    // Capturar les coordenades actuals del polígon
+    const currentCoords = drawControlRef.current?.getCurrentPolygonCoords();
+
+    // Crear l'objecte amb les dades més actuals
+    const currentData = {
+      ...editorState.editingAssociacio,
+      poligon: currentCoords && currentCoords.length > 0 ? currentCoords : editorState.editingAssociacio.poligon,
+    };
+
+    // Descarregar el JSON
+    const dataStr = JSON.stringify(currentData, null, 2);
+    const filename = `${currentData.id}.json`;
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   // Eliminar associació
   const handleDelete = (id: string) => {
@@ -649,7 +673,7 @@ export default function MapEditor() {
               {/* Botons d'acció */}
               <div className="space-y-2 pt-4 border-t border-warm-200 mt-4">
                 <button
-                  onClick={() => downloadJSON(editorState.editingAssociacio?.id)}
+                  onClick={handleDownloadCurrentJSON}
                   className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
                 >
                   <Download size={18} />
