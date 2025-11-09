@@ -264,6 +264,40 @@ export default function MapEditor() {
     return 'assoc-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
   };
 
+  // Generar color aleatori amb bona saturació i luminositat
+  const generateRandomColor = () => {
+    // Generar hue aleatori (0-360)
+    const hue = Math.floor(Math.random() * 360);
+    // Saturació alta per colors vius (60-90%)
+    const saturation = 60 + Math.floor(Math.random() * 30);
+    // Luminositat mitjana per visibilitat (40-60%)
+    const lightness = 40 + Math.floor(Math.random() * 20);
+
+    // Convertir HSL a RGB
+    const h = hue / 360;
+    const s = saturation / 100;
+    const l = lightness / 100;
+
+    const c = (1 - Math.abs(2 * l - 1)) * s;
+    const x = c * (1 - Math.abs(((h * 6) % 2) - 1));
+    const m = l - c / 2;
+
+    let r = 0, g = 0, b = 0;
+    if (h < 1/6) { r = c; g = x; b = 0; }
+    else if (h < 2/6) { r = x; g = c; b = 0; }
+    else if (h < 3/6) { r = 0; g = c; b = x; }
+    else if (h < 4/6) { r = 0; g = x; b = c; }
+    else if (h < 5/6) { r = x; g = 0; b = c; }
+    else { r = c; g = 0; b = x; }
+
+    const toHex = (n: number) => {
+      const hex = Math.round((n + m) * 255).toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    };
+
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  };
+
   // Iniciar edició d'una associació
   const startEdit = (assoc: Associacio) => {
     setEditorState({
@@ -279,7 +313,7 @@ export default function MapEditor() {
       id: generateId(),
       nom: 'Nova Associació',
       abreviacio: 'NOVA',
-      color: '#f97316',
+      color: generateRandomColor(),
       poligon: [],
       descripcio: '',
       contacte: '',
