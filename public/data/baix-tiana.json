@@ -1,0 +1,37 @@
+{
+  "id": "baix-tiana",
+  "nom": "Baix Tiana - Parc del Tramvia",
+  "abreviacio": "BAIX",
+  "color": "#50d3bf",
+  "poligon": [
+    [
+      41.47355409414004,
+      2.26893424987793
+    ],
+    [
+      41.47191417785364,
+      2.271981239318848
+    ],
+    [
+      41.473329010047294,
+      2.276079654693604
+    ],
+    [
+      41.47609427471709,
+      2.273805141448975
+    ],
+    [
+      41.479,
+      2.27
+    ],
+    [
+      41.47488850520913,
+      2.268784046173096
+    ]
+  ],
+  "descripcio": "Zona de Baix Tiana i Parc Tramvia",
+  "contacte": "Joan Francesc Fleta Perbellini",
+  "email": "associacioveinsbaixtiana@gmail.com",
+  "telefon": "630172256",
+  "url": ""
+}
