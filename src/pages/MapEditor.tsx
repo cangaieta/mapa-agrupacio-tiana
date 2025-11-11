@@ -247,6 +247,7 @@ export default function MapEditor() {
     addAssociacio,
     deleteAssociacio,
     clearDirtyData,
+    getDirtyIds,
   } = useAssociacions();
 
   const [editorState, setEditorState] = useState<EditorState>({
@@ -256,6 +257,9 @@ export default function MapEditor() {
   });
 
   const drawControlRef = useRef<{ getCurrentPolygonCoords: () => [number, number][] | null }>(null);
+
+  // Obtenir IDs dirty per aplicar estils especials
+  const dirtyIds = getDirtyIds();
 
   // Centre ajustat per mostrar millor la zona habitada (més al sud, menys muntanya)
   const tianaCenter: LatLngExpression = [41.48, 2.27];
@@ -467,18 +471,22 @@ export default function MapEditor() {
           {/* Mostrar polígons existents */}
           {associacions
             .filter(a => a.id !== editorState.selectedId)
-            .map((assoc) => (
-              <Polygon
-                key={assoc.id}
-                positions={assoc.poligon as LatLngExpression[]}
-                pathOptions={{
-                  color: assoc.color,
-                  fillColor: assoc.color,
-                  fillOpacity: 0.3,
-                  weight: 2,
-                }}
-              />
-            ))}
+            .map((assoc) => {
+              const isDirty = dirtyIds.includes(assoc.id);
+              return (
+                <Polygon
+                  key={assoc.id}
+                  positions={assoc.poligon as LatLngExpression[]}
+                  pathOptions={{
+                    color: isDirty ? '#fbbf24' : assoc.color,
+                    fillColor: assoc.color,
+                    fillOpacity: 0.3,
+                    weight: isDirty ? 3 : 2,
+                    dashArray: isDirty ? '5, 5' : undefined,
+                  }}
+                />
+              );
+            })}
 
           {/* Controls de dibuix */}
           {(editorState.mode === 'create' || editorState.mode === 'edit') && (

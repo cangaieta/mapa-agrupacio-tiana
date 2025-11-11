@@ -27,7 +27,7 @@ function CenterMap({ center }: { center: LatLngExpression }) {
 }
 
 export default function MapViewer() {
-  const { associacions, loading } = useAssociacions();
+  const { associacions, loading } = useAssociacions({ ignoreLocalStorage: true });
   const [selectedAssociacio, setSelectedAssociacio] = useState<Associacio | null>(null);
 
   // Centre de Tiana
