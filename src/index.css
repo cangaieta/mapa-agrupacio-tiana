@@ -88,3 +88,17 @@ body {
   background: #f97316;
   border: 2px solid #fff;
 }
+
+/* Animació de parpelleig suau per polígons dirty */
+@keyframes dirty-pulse {
+  0%, 100% {
+    stroke-opacity: 1;
+  }
+  50% {
+    stroke-opacity: 0.4;
+  }
+}
+
+.dirty-polygon {
+  animation: dirty-pulse 2s ease-in-out infinite;
+}

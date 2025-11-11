@@ -478,11 +478,12 @@ export default function MapEditor() {
                   key={assoc.id}
                   positions={assoc.poligon as LatLngExpression[]}
                   pathOptions={{
-                    color: isDirty ? '#fbbf24' : assoc.color,
+                    color: assoc.color,
                     fillColor: assoc.color,
-                    fillOpacity: 0.3,
-                    weight: isDirty ? 3 : 2,
-                    dashArray: isDirty ? '5, 5' : undefined,
+                    fillOpacity: isDirty ? 0.08 : 0.3,
+                    weight: isDirty ? 4 : 2,
+                    dashArray: isDirty ? '10, 5' : undefined,
+                    className: isDirty ? 'dirty-polygon' : undefined,
                   }}
                 />
               );
