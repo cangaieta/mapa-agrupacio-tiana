@@ -1,0 +1,53 @@
+{
+  "id": "dr-mascaro",
+  "nom": "Plataforma d'Afectats Dr. Mascaró",
+  "abreviacio": "PADMA",
+  "color": "#1cd4c8",
+  "poligon": [
+    [
+      41.483031032854306,
+      2.266016006469727
+    ],
+    [
+      41.48206652228437,
+      2.2661340236663823
+    ],
+    [
+      41.48104573296132,
+      2.2666811943054204
+    ],
+    [
+      41.48111003512551,
+      2.2673785686492924
+    ],
+    [
+      41.481182374983945,
+      2.2680974006652836
+    ],
+    [
+      41.482379989794275,
+      2.268558740615845
+    ],
+    [
+      41.48340075809978,
+      2.2679471969604497
+    ],
+    [
+      41.48360169484841,
+      2.2677540779113774
+    ],
+    [
+      41.48356954501049,
+      2.2674536705017094
+    ],
+    [
+      41.4839874916591,
+      2.2664344310760502
+    ]
+  ],
+  "descripcio": "La Plataforma va nèixer a mitjans del 2024 en defensa al dret al descans vulnerat per l'increment d'activitats d'oci nocturns que l'Ajuntament de Tiana ve autoritzant",
+  "contacte": "",
+  "email": "plataformafectatsdrmascaro@gmail.com",
+  "telefon": "",
+  "url": ""
+}
